@@ -1,7 +1,7 @@
 /**
  * @license
  * lodash (Custom Build) <https://lodash.com/>
- * Build: `lodash -d -o lodash.js exports="node" include="isFunction,isObject,isString,isBoolean,isNumber,isUndefined,isArray,isNull,extend,pick,each,filter,bind,invoke,invokeMap,clone,reduce,has,result,uniqueId,map,find,omitBy,indexOf,first,values,reject,once,last,isEqual,defaults,noop,keys,merge,after,debounce,throttle,intersection,every,isRegExp,identity,includes,partial,sortBy,inRange"`
+ * Build: `lodash -d -o lodash.js exports="node" include="isFunction,isObject,isString,isBoolean,isNumber,isUndefined,isArray,isNull,extend,pick,each,filter,bind,invoke,invokeMap,clone,reduce,has,result,uniqueId,map,find,omitBy,indexOf,first,values,reject,once,last,isEqual,defaults,noop,keys,merge,after,debounce,throttle,intersection,every,isRegExp,identity,includes,partial,sortBy,inRange,noConflict"`
  * Copyright jQuery Foundation and other contributors <https://jquery.org/>
  * Released under MIT license <https://lodash.com/license>
  * Based on Underscore.js 1.8.3 <http://underscorejs.org/LICENSE>
@@ -774,6 +774,9 @@
    * of values.
    */
   var objectToString = objectProto.toString;
+
+  /** Used to restore the original `_` reference in `_.noConflict`. */
+  var oldDash = root._;
 
   /** Used to detect if a method is native. */
   var reIsNative = RegExp('^' +
@@ -6860,6 +6863,26 @@
   }
 
   /**
+   * Reverts the `_` variable to its previous value and returns a reference to
+   * the `lodash` function.
+   *
+   * @static
+   * @since 0.1.0
+   * @memberOf _
+   * @category Util
+   * @returns {Function} Returns the `lodash` function.
+   * @example
+   *
+   * var lodash = _.noConflict();
+   */
+  function noConflict() {
+    if (root._ === this) {
+      root._ = oldDash;
+    }
+    return this;
+  }
+
+  /**
    * This method returns `undefined`.
    *
    * @static
@@ -7040,6 +7063,7 @@
   lodash.last = last;
   lodash.stubArray = stubArray;
   lodash.stubFalse = stubFalse;
+  lodash.noConflict = noConflict;
   lodash.noop = noop;
   lodash.now = now;
   lodash.reduce = reduce;
