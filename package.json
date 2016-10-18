@@ -4,12 +4,7 @@
   "author": "Jonathan Newman (http://staticty.pe)",
   "version": "4.12.0",
   "homepage": "http://footworkjs.com",
-  "licenses": [
-    {
-      "type": "MIT",
-      "url": "http://www.opensource.org/licenses/mit-license.php"
-    }
-  ],
+  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "git://github.com/footworkjs/lodash.git"
