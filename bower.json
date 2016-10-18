@@ -1,0 +1,51 @@
+{
+  "name": "footwork",
+  "description": "A solid footing for web applications.",
+  "homepage": "http://footworkjs.com",
+  "license": "MIT",
+  "keywords": [
+    "knockout",
+    "SPA",
+    "framework"
+  ],
+  "author": "Jonathan Newman <jonathan@staticty.pe>",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/footworkjs/footwork.git"
+  },
+  "moduleType": [
+    "amd",
+    "globals",
+    "node"
+  ],
+  "main": [
+    "./dist/footwork.min.js",
+    "./dist/footwork.css"
+  ],
+  "ignore": [
+    "source",
+    "tests",
+    "bower_components",
+    "node_modules",
+    "bower.json",
+    "gulpfile.js",
+    "karma.conf.js",
+    ".travis.yml",
+    ".gitignore",
+    "README.md"
+  ],
+  "dependencies": {
+    "requirejs": "*",
+    "requirejs-text": "*",
+    "promise-polyfill": "*",
+    "fetch-polyfill": "*"
+  },
+  "devDependencies": {
+    "conduitjs": "0.3.3",
+    "lodash": "^4.12",
+    "postal.js": "https://github.com/footworkjs/postal.js.git#1c0f05fba21520a6c968e67a8dbb4f053d5d9f72",
+    "knockoutjs": "3.4.0",
+    "riveter": "https://github.com/footworkjs/riveter.git#19284fbe487225f09cbceee4e4ea2a98ad71e8c2",
+    "jquery": "1.12.4"
+  }
+}
