@@ -1,7 +1,7 @@
 /**
  * @license
  * lodash (Custom Build) <https://lodash.com/>
- * Build: `lodash -d -o lodash.js exports="node" include="isFunction,isObject,isString,isBoolean,isNumber,isUndefined,isArray,isNull,extend,pick,each,filter,bind,invoke,invokeMap,clone,reduce,has,result,uniqueId,map,find,omitBy,indexOf,first,values,reject,once,last,isEqual,defaults,noop,keys,merge,after,debounce,throttle,intersection,every,isRegExp,identity,includes,partial,sortBy,inRange,noConflict"`
+ * Build: `lodash -d -o lodash.js exports="node" include="isFunction,isObject,isString,isBoolean,isNumber,isUndefined,isArray,isNull,extend,pick,each,filter,bind,invoke,invokeMap,clone,reduce,has,result,uniqueId,map,find,omitBy,indexOf,first,values,reject,once,last,isEqual,defaults,noop,keys,merge,after,debounce,throttle,intersection,every,isRegExp,identity,includes,partial,sortBy,inRange,noConflict,remove"`
  * Copyright jQuery Foundation and other contributors <https://jquery.org/>
  * Released under MIT license <https://lodash.com/license>
  * Based on Underscore.js 1.8.3 <http://underscorejs.org/LICENSE>
@@ -2483,6 +2483,42 @@
   }
 
   /**
+   * The base implementation of `_.pullAt` without support for individual
+   * indexes or capturing the removed elements.
+   *
+   * @private
+   * @param {Array} array The array to modify.
+   * @param {number[]} indexes The indexes of elements to remove.
+   * @returns {Array} Returns `array`.
+   */
+  function basePullAt(array, indexes) {
+    var length = array ? indexes.length : 0,
+        lastIndex = length - 1;
+
+    while (length--) {
+      var index = indexes[length];
+      if (length == lastIndex || index !== previous) {
+        var previous = index;
+        if (isIndex(index)) {
+          splice.call(array, index, 1);
+        }
+        else if (!isKey(index, array)) {
+          var path = castPath(index),
+              object = parent(array, path);
+
+          if (object != null) {
+            delete object[toKey(last(path))];
+          }
+        }
+        else {
+          delete array[toKey(index)];
+        }
+      }
+    }
+    return array;
+  }
+
+  /**
    * The base implementation of `_.rest` which doesn't validate or coerce arguments.
    *
    * @private
@@ -4586,6 +4622,56 @@
   function last(array) {
     var length = array ? array.length : 0;
     return length ? array[length - 1] : undefined;
+  }
+
+  /**
+   * Removes all elements from `array` that `predicate` returns truthy for
+   * and returns an array of the removed elements. The predicate is invoked
+   * with three arguments: (value, index, array).
+   *
+   * **Note:** Unlike `_.filter`, this method mutates `array`. Use `_.pull`
+   * to pull elements from an array by value.
+   *
+   * @static
+   * @memberOf _
+   * @since 2.0.0
+   * @category Array
+   * @param {Array} array The array to modify.
+   * @param {Function} [predicate=_.identity]
+   *  The function invoked per iteration.
+   * @returns {Array} Returns the new array of removed elements.
+   * @example
+   *
+   * var array = [1, 2, 3, 4];
+   * var evens = _.remove(array, function(n) {
+   *   return n % 2 == 0;
+   * });
+   *
+   * console.log(array);
+   * // => [1, 3]
+   *
+   * console.log(evens);
+   * // => [2, 4]
+   */
+  function remove(array, predicate) {
+    var result = [];
+    if (!(array && array.length)) {
+      return result;
+    }
+    var index = -1,
+        indexes = [],
+        length = array.length;
+
+    predicate = getIteratee(predicate, 3);
+    while (++index < length) {
+      var value = array[index];
+      if (predicate(value, index, array)) {
+        result.push(value);
+        indexes.push(index);
+      }
+    }
+    basePullAt(array, indexes);
+    return result;
   }
 
   /*------------------------------------------------------------------------*/
@@ -7014,6 +7100,7 @@
   lodash.pickBy = pickBy;
   lodash.property = property;
   lodash.reject = reject;
+  lodash.remove = remove;
   lodash.sortBy = sortBy;
   lodash.throttle = throttle;
   lodash.toPlainObject = toPlainObject;
