@@ -1,5 +1,5 @@
 {
-  "name": "lodash",
+  "name": "footwork-lodash",
   "description": "Custom lodash build utilized internally by FootworkJS",
   "author": "Jonathan Newman (http://staticty.pe)",
   "version": "4.12.0",
