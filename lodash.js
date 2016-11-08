@@ -1,7 +1,7 @@
 /**
  * @license
  * lodash (Custom Build) <https://lodash.com/>
- * Build: `lodash -d -o lodash.js exports="node" include="isFunction,isObject,isString,isBoolean,isNumber,isUndefined,isArray,isNull,extend,pick,each,filter,bind,invoke,invokeMap,clone,reduce,has,result,uniqueId,map,find,omitBy,indexOf,first,values,reject,once,last,isEqual,defaults,noop,keys,merge,after,debounce,throttle,intersection,every,isRegExp,identity,includes,partial,sortBy,inRange,noConflict,remove"`
+ * Build: `lodash -d -o lodash.js exports="node" include="isFunction,isObject,isString,isBoolean,isNumber,isUndefined,isArray,isNull,extend,pick,each,filter,invokeMap,clone,reduce,result,uniqueId,map,find,omitBy,indexOf,values,last,isEqual,noop,keys,merge,intersection,every,isRegExp,identity,includes,partial,noConflict,remove"`
  * Copyright jQuery Foundation and other contributors <https://jquery.org/>
  * Released under MIT license <https://lodash.com/license>
  * Based on Underscore.js 1.8.3 <http://underscorejs.org/LICENSE>
@@ -531,26 +531,6 @@
         : iteratee(accumulator, value, index, collection);
     });
     return accumulator;
-  }
-
-  /**
-   * The base implementation of `_.sortBy` which uses `comparer` to define the
-   * sort order of `array` and replaces criteria objects with their corresponding
-   * values.
-   *
-   * @private
-   * @param {Array} array The array to sort.
-   * @param {Function} comparer The function to define sort order.
-   * @returns {Array} Returns `array`.
-   */
-  function baseSortBy(array, comparer) {
-    var length = array.length;
-
-    array.sort(comparer);
-    while (length--) {
-      array[length] = array[length].value;
-    }
-    return array;
   }
 
   /**
@@ -1532,24 +1512,6 @@
   }
 
   /**
-   * Used by `_.defaults` to customize its `_.assignIn` use.
-   *
-   * @private
-   * @param {*} objValue The destination value.
-   * @param {*} srcValue The source value.
-   * @param {string} key The key of the property to assign.
-   * @param {Object} object The parent object of `objValue`.
-   * @returns {*} Returns the value to assign.
-   */
-  function assignInDefaults(objValue, srcValue, key, object) {
-    if (objValue === undefined ||
-        (eq(objValue, objectProto[key]) && !hasOwnProperty.call(object, key))) {
-      return srcValue;
-    }
-    return objValue;
-  }
-
-  /**
    * This function is like `assignValue` except that it doesn't assign
    * `undefined` values.
    *
@@ -1859,18 +1821,6 @@
   }
 
   /**
-   * The base implementation of `_.has` without support for deep paths.
-   *
-   * @private
-   * @param {Object} [object] The object to query.
-   * @param {Array|string} key The key to check.
-   * @returns {boolean} Returns `true` if `key` exists, else `false`.
-   */
-  function baseHas(object, key) {
-    return object != null && hasOwnProperty.call(object, key);
-  }
-
-  /**
    * The base implementation of `_.hasIn` without support for deep paths.
    *
    * @private
@@ -1880,19 +1830,6 @@
    */
   function baseHasIn(object, key) {
     return object != null && key in Object(object);
-  }
-
-  /**
-   * The base implementation of `_.inRange` which doesn't coerce arguments.
-   *
-   * @private
-   * @param {number} number The number to check.
-   * @param {number} start The start of the range.
-   * @param {number} end The end of the range.
-   * @returns {boolean} Returns `true` if `number` is in the range, else `false`.
-   */
-  function baseInRange(number, start, end) {
-    return number >= nativeMin(start, end) && number < nativeMax(start, end);
   }
 
   /**
@@ -2404,31 +2341,6 @@
   }
 
   /**
-   * The base implementation of `_.orderBy` without param guards.
-   *
-   * @private
-   * @param {Array|Object} collection The collection to iterate over.
-   * @param {Function[]|Object[]|string[]} iteratees The iteratees to sort by.
-   * @param {string[]} orders The sort orders of `iteratees`.
-   * @returns {Array} Returns the new sorted array.
-   */
-  function baseOrderBy(collection, iteratees, orders) {
-    var index = -1;
-    iteratees = arrayMap(iteratees.length ? iteratees : [identity], baseUnary(getIteratee()));
-
-    var result = baseMap(collection, function(value, key, collection) {
-      var criteria = arrayMap(iteratees, function(iteratee) {
-        return iteratee(value);
-      });
-      return { 'criteria': criteria, 'index': ++index, 'value': value };
-    });
-
-    return baseSortBy(result, function(object, other) {
-      return compareMultiple(object, other, orders);
-    });
-  }
-
-  /**
    * The base implementation of `_.pick` without support for individual
    * property identifiers.
    *
@@ -2744,85 +2656,6 @@
   function cloneTypedArray(typedArray, isDeep) {
     var buffer = isDeep ? cloneArrayBuffer(typedArray.buffer) : typedArray.buffer;
     return new typedArray.constructor(buffer, typedArray.byteOffset, typedArray.length);
-  }
-
-  /**
-   * Compares values to sort them in ascending order.
-   *
-   * @private
-   * @param {*} value The value to compare.
-   * @param {*} other The other value to compare.
-   * @returns {number} Returns the sort order indicator for `value`.
-   */
-  function compareAscending(value, other) {
-    if (value !== other) {
-      var valIsDefined = value !== undefined,
-          valIsNull = value === null,
-          valIsReflexive = value === value,
-          valIsSymbol = isSymbol(value);
-
-      var othIsDefined = other !== undefined,
-          othIsNull = other === null,
-          othIsReflexive = other === other,
-          othIsSymbol = isSymbol(other);
-
-      if ((!othIsNull && !othIsSymbol && !valIsSymbol && value > other) ||
-          (valIsSymbol && othIsDefined && othIsReflexive && !othIsNull && !othIsSymbol) ||
-          (valIsNull && othIsDefined && othIsReflexive) ||
-          (!valIsDefined && othIsReflexive) ||
-          !valIsReflexive) {
-        return 1;
-      }
-      if ((!valIsNull && !valIsSymbol && !othIsSymbol && value < other) ||
-          (othIsSymbol && valIsDefined && valIsReflexive && !valIsNull && !valIsSymbol) ||
-          (othIsNull && valIsDefined && valIsReflexive) ||
-          (!othIsDefined && valIsReflexive) ||
-          !othIsReflexive) {
-        return -1;
-      }
-    }
-    return 0;
-  }
-
-  /**
-   * Used by `_.orderBy` to compare multiple properties of a value to another
-   * and stable sort them.
-   *
-   * If `orders` is unspecified, all values are sorted in ascending order. Otherwise,
-   * specify an order of "desc" for descending or "asc" for ascending sort order
-   * of corresponding values.
-   *
-   * @private
-   * @param {Object} object The object to compare.
-   * @param {Object} other The other object to compare.
-   * @param {boolean[]|string[]} orders The order to sort by for each property.
-   * @returns {number} Returns the sort order indicator for `object`.
-   */
-  function compareMultiple(object, other, orders) {
-    var index = -1,
-        objCriteria = object.criteria,
-        othCriteria = other.criteria,
-        length = objCriteria.length,
-        ordersLength = orders.length;
-
-    while (++index < length) {
-      var result = compareAscending(objCriteria[index], othCriteria[index]);
-      if (result) {
-        if (index >= ordersLength) {
-          return result;
-        }
-        var order = orders[index];
-        return result * (order == 'desc' ? -1 : 1);
-      }
-    }
-    // Fixes an `Array#sort` bug in the JS engine embedded in Adobe applications
-    // that causes it, under certain circumstances, to provide the same value for
-    // `object` and `other`. See https://github.com/jashkenas/underscore/pull/1247
-    // for more details.
-    //
-    // This also ensures a stable sort in V8 and other engines.
-    // See https://bugs.chromium.org/p/v8/issues/detail?id=90 for more details.
-    return object.index - other.index;
   }
 
   /**
@@ -4525,28 +4358,6 @@
   }
 
   /**
-   * Gets the first element of `array`.
-   *
-   * @static
-   * @memberOf _
-   * @since 0.1.0
-   * @alias first
-   * @category Array
-   * @param {Array} array The array to query.
-   * @returns {*} Returns the first element of `array`.
-   * @example
-   *
-   * _.head([1, 2, 3]);
-   * // => 1
-   *
-   * _.head([]);
-   * // => undefined
-   */
-  function head(array) {
-    return (array && array.length) ? array[0] : undefined;
-  }
-
-  /**
    * Gets the index at which the first occurrence of `value` is found in `array`
    * using [`SameValueZero`](http://ecma-international.org/ecma-262/7.0/#sec-samevaluezero)
    * for equality comparisons. If `fromIndex` is negative, it's used as the
@@ -5013,400 +4824,7 @@
     return func(collection, getIteratee(iteratee, 4), accumulator, initAccum, baseEach);
   }
 
-  /**
-   * The opposite of `_.filter`; this method returns the elements of `collection`
-   * that `predicate` does **not** return truthy for.
-   *
-   * @static
-   * @memberOf _
-   * @since 0.1.0
-   * @category Collection
-   * @param {Array|Object} collection The collection to iterate over.
-   * @param {Function} [predicate=_.identity] The function invoked per iteration.
-   * @returns {Array} Returns the new filtered array.
-   * @see _.filter
-   * @example
-   *
-   * var users = [
-   *   { 'user': 'barney', 'age': 36, 'active': false },
-   *   { 'user': 'fred',   'age': 40, 'active': true }
-   * ];
-   *
-   * _.reject(users, function(o) { return !o.active; });
-   * // => objects for ['fred']
-   *
-   * // The `_.matches` iteratee shorthand.
-   * _.reject(users, { 'age': 40, 'active': true });
-   * // => objects for ['barney']
-   *
-   * // The `_.matchesProperty` iteratee shorthand.
-   * _.reject(users, ['active', false]);
-   * // => objects for ['fred']
-   *
-   * // The `_.property` iteratee shorthand.
-   * _.reject(users, 'active');
-   * // => objects for ['barney']
-   */
-  function reject(collection, predicate) {
-    var func = isArray(collection) ? arrayFilter : baseFilter;
-    return func(collection, negate(getIteratee(predicate, 3)));
-  }
-
-  /**
-   * Creates an array of elements, sorted in ascending order by the results of
-   * running each element in a collection thru each iteratee. This method
-   * performs a stable sort, that is, it preserves the original sort order of
-   * equal elements. The iteratees are invoked with one argument: (value).
-   *
-   * @static
-   * @memberOf _
-   * @since 0.1.0
-   * @category Collection
-   * @param {Array|Object} collection The collection to iterate over.
-   * @param {...(Function|Function[])} [iteratees=[_.identity]]
-   *  The iteratees to sort by.
-   * @returns {Array} Returns the new sorted array.
-   * @example
-   *
-   * var users = [
-   *   { 'user': 'fred',   'age': 48 },
-   *   { 'user': 'barney', 'age': 36 },
-   *   { 'user': 'fred',   'age': 40 },
-   *   { 'user': 'barney', 'age': 34 }
-   * ];
-   *
-   * _.sortBy(users, [function(o) { return o.user; }]);
-   * // => objects for [['barney', 36], ['barney', 34], ['fred', 48], ['fred', 40]]
-   *
-   * _.sortBy(users, ['user', 'age']);
-   * // => objects for [['barney', 34], ['barney', 36], ['fred', 40], ['fred', 48]]
-   */
-  var sortBy = baseRest(function(collection, iteratees) {
-    if (collection == null) {
-      return [];
-    }
-    var length = iteratees.length;
-    if (length > 1 && isIterateeCall(collection, iteratees[0], iteratees[1])) {
-      iteratees = [];
-    } else if (length > 2 && isIterateeCall(iteratees[0], iteratees[1], iteratees[2])) {
-      iteratees = [iteratees[0]];
-    }
-    return baseOrderBy(collection, baseFlatten(iteratees, 1), []);
-  });
-
   /*------------------------------------------------------------------------*/
-
-  /**
-   * Gets the timestamp of the number of milliseconds that have elapsed since
-   * the Unix epoch (1 January 1970 00:00:00 UTC).
-   *
-   * @static
-   * @memberOf _
-   * @since 2.4.0
-   * @category Date
-   * @returns {number} Returns the timestamp.
-   * @example
-   *
-   * _.defer(function(stamp) {
-   *   console.log(_.now() - stamp);
-   * }, _.now());
-   * // => Logs the number of milliseconds it took for the deferred invocation.
-   */
-  var now = function() {
-    return root.Date.now();
-  };
-
-  /*------------------------------------------------------------------------*/
-
-  /**
-   * The opposite of `_.before`; this method creates a function that invokes
-   * `func` once it's called `n` or more times.
-   *
-   * @static
-   * @memberOf _
-   * @since 0.1.0
-   * @category Function
-   * @param {number} n The number of calls before `func` is invoked.
-   * @param {Function} func The function to restrict.
-   * @returns {Function} Returns the new restricted function.
-   * @example
-   *
-   * var saves = ['profile', 'settings'];
-   *
-   * var done = _.after(saves.length, function() {
-   *   console.log('done saving!');
-   * });
-   *
-   * _.forEach(saves, function(type) {
-   *   asyncSave({ 'type': type, 'complete': done });
-   * });
-   * // => Logs 'done saving!' after the two async saves have completed.
-   */
-  function after(n, func) {
-    if (typeof func != 'function') {
-      throw new TypeError(FUNC_ERROR_TEXT);
-    }
-    n = toInteger(n);
-    return function() {
-      if (--n < 1) {
-        return func.apply(this, arguments);
-      }
-    };
-  }
-
-  /**
-   * Creates a function that invokes `func`, with the `this` binding and arguments
-   * of the created function, while it's called less than `n` times. Subsequent
-   * calls to the created function return the result of the last `func` invocation.
-   *
-   * @static
-   * @memberOf _
-   * @since 3.0.0
-   * @category Function
-   * @param {number} n The number of calls at which `func` is no longer invoked.
-   * @param {Function} func The function to restrict.
-   * @returns {Function} Returns the new restricted function.
-   * @example
-   *
-   * jQuery(element).on('click', _.before(5, addContactToList));
-   * // => Allows adding up to 4 contacts to the list.
-   */
-  function before(n, func) {
-    var result;
-    if (typeof func != 'function') {
-      throw new TypeError(FUNC_ERROR_TEXT);
-    }
-    n = toInteger(n);
-    return function() {
-      if (--n > 0) {
-        result = func.apply(this, arguments);
-      }
-      if (n <= 1) {
-        func = undefined;
-      }
-      return result;
-    };
-  }
-
-  /**
-   * Creates a function that invokes `func` with the `this` binding of `thisArg`
-   * and `partials` prepended to the arguments it receives.
-   *
-   * The `_.bind.placeholder` value, which defaults to `_` in monolithic builds,
-   * may be used as a placeholder for partially applied arguments.
-   *
-   * **Note:** Unlike native `Function#bind`, this method doesn't set the "length"
-   * property of bound functions.
-   *
-   * @static
-   * @memberOf _
-   * @since 0.1.0
-   * @category Function
-   * @param {Function} func The function to bind.
-   * @param {*} thisArg The `this` binding of `func`.
-   * @param {...*} [partials] The arguments to be partially applied.
-   * @returns {Function} Returns the new bound function.
-   * @example
-   *
-   * function greet(greeting, punctuation) {
-   *   return greeting + ' ' + this.user + punctuation;
-   * }
-   *
-   * var object = { 'user': 'fred' };
-   *
-   * var bound = _.bind(greet, object, 'hi');
-   * bound('!');
-   * // => 'hi fred!'
-   *
-   * // Bound with placeholders.
-   * var bound = _.bind(greet, object, _, '!');
-   * bound('hi');
-   * // => 'hi fred!'
-   */
-  var bind = baseRest(function(func, thisArg, partials) {
-    var bitmask = BIND_FLAG;
-    if (partials.length) {
-      var holders = replaceHolders(partials, getHolder(bind));
-      bitmask |= PARTIAL_FLAG;
-    }
-    return createWrap(func, bitmask, thisArg, partials, holders);
-  });
-
-  /**
-   * Creates a debounced function that delays invoking `func` until after `wait`
-   * milliseconds have elapsed since the last time the debounced function was
-   * invoked. The debounced function comes with a `cancel` method to cancel
-   * delayed `func` invocations and a `flush` method to immediately invoke them.
-   * Provide `options` to indicate whether `func` should be invoked on the
-   * leading and/or trailing edge of the `wait` timeout. The `func` is invoked
-   * with the last arguments provided to the debounced function. Subsequent
-   * calls to the debounced function return the result of the last `func`
-   * invocation.
-   *
-   * **Note:** If `leading` and `trailing` options are `true`, `func` is
-   * invoked on the trailing edge of the timeout only if the debounced function
-   * is invoked more than once during the `wait` timeout.
-   *
-   * If `wait` is `0` and `leading` is `false`, `func` invocation is deferred
-   * until to the next tick, similar to `setTimeout` with a timeout of `0`.
-   *
-   * See [David Corbacho's article](https://css-tricks.com/debouncing-throttling-explained-examples/)
-   * for details over the differences between `_.debounce` and `_.throttle`.
-   *
-   * @static
-   * @memberOf _
-   * @since 0.1.0
-   * @category Function
-   * @param {Function} func The function to debounce.
-   * @param {number} [wait=0] The number of milliseconds to delay.
-   * @param {Object} [options={}] The options object.
-   * @param {boolean} [options.leading=false]
-   *  Specify invoking on the leading edge of the timeout.
-   * @param {number} [options.maxWait]
-   *  The maximum time `func` is allowed to be delayed before it's invoked.
-   * @param {boolean} [options.trailing=true]
-   *  Specify invoking on the trailing edge of the timeout.
-   * @returns {Function} Returns the new debounced function.
-   * @example
-   *
-   * // Avoid costly calculations while the window size is in flux.
-   * jQuery(window).on('resize', _.debounce(calculateLayout, 150));
-   *
-   * // Invoke `sendMail` when clicked, debouncing subsequent calls.
-   * jQuery(element).on('click', _.debounce(sendMail, 300, {
-   *   'leading': true,
-   *   'trailing': false
-   * }));
-   *
-   * // Ensure `batchLog` is invoked once after 1 second of debounced calls.
-   * var debounced = _.debounce(batchLog, 250, { 'maxWait': 1000 });
-   * var source = new EventSource('/stream');
-   * jQuery(source).on('message', debounced);
-   *
-   * // Cancel the trailing debounced invocation.
-   * jQuery(window).on('popstate', debounced.cancel);
-   */
-  function debounce(func, wait, options) {
-    var lastArgs,
-        lastThis,
-        maxWait,
-        result,
-        timerId,
-        lastCallTime,
-        lastInvokeTime = 0,
-        leading = false,
-        maxing = false,
-        trailing = true;
-
-    if (typeof func != 'function') {
-      throw new TypeError(FUNC_ERROR_TEXT);
-    }
-    wait = toNumber(wait) || 0;
-    if (isObject(options)) {
-      leading = !!options.leading;
-      maxing = 'maxWait' in options;
-      maxWait = maxing ? nativeMax(toNumber(options.maxWait) || 0, wait) : maxWait;
-      trailing = 'trailing' in options ? !!options.trailing : trailing;
-    }
-
-    function invokeFunc(time) {
-      var args = lastArgs,
-          thisArg = lastThis;
-
-      lastArgs = lastThis = undefined;
-      lastInvokeTime = time;
-      result = func.apply(thisArg, args);
-      return result;
-    }
-
-    function leadingEdge(time) {
-      // Reset any `maxWait` timer.
-      lastInvokeTime = time;
-      // Start the timer for the trailing edge.
-      timerId = setTimeout(timerExpired, wait);
-      // Invoke the leading edge.
-      return leading ? invokeFunc(time) : result;
-    }
-
-    function remainingWait(time) {
-      var timeSinceLastCall = time - lastCallTime,
-          timeSinceLastInvoke = time - lastInvokeTime,
-          result = wait - timeSinceLastCall;
-
-      return maxing ? nativeMin(result, maxWait - timeSinceLastInvoke) : result;
-    }
-
-    function shouldInvoke(time) {
-      var timeSinceLastCall = time - lastCallTime,
-          timeSinceLastInvoke = time - lastInvokeTime;
-
-      // Either this is the first call, activity has stopped and we're at the
-      // trailing edge, the system time has gone backwards and we're treating
-      // it as the trailing edge, or we've hit the `maxWait` limit.
-      return (lastCallTime === undefined || (timeSinceLastCall >= wait) ||
-        (timeSinceLastCall < 0) || (maxing && timeSinceLastInvoke >= maxWait));
-    }
-
-    function timerExpired() {
-      var time = now();
-      if (shouldInvoke(time)) {
-        return trailingEdge(time);
-      }
-      // Restart the timer.
-      timerId = setTimeout(timerExpired, remainingWait(time));
-    }
-
-    function trailingEdge(time) {
-      timerId = undefined;
-
-      // Only invoke if we have `lastArgs` which means `func` has been
-      // debounced at least once.
-      if (trailing && lastArgs) {
-        return invokeFunc(time);
-      }
-      lastArgs = lastThis = undefined;
-      return result;
-    }
-
-    function cancel() {
-      if (timerId !== undefined) {
-        clearTimeout(timerId);
-      }
-      lastInvokeTime = 0;
-      lastArgs = lastCallTime = lastThis = timerId = undefined;
-    }
-
-    function flush() {
-      return timerId === undefined ? result : trailingEdge(now());
-    }
-
-    function debounced() {
-      var time = now(),
-          isInvoking = shouldInvoke(time);
-
-      lastArgs = arguments;
-      lastThis = this;
-      lastCallTime = time;
-
-      if (isInvoking) {
-        if (timerId === undefined) {
-          return leadingEdge(lastCallTime);
-        }
-        if (maxing) {
-          // Handle invocations in a tight loop.
-          timerId = setTimeout(timerExpired, wait);
-          return invokeFunc(lastCallTime);
-        }
-      }
-      if (timerId === undefined) {
-        timerId = setTimeout(timerExpired, wait);
-      }
-      return result;
-    }
-    debounced.cancel = cancel;
-    debounced.flush = flush;
-    return debounced;
-  }
 
   /**
    * Creates a function that memoizes the result of `func`. If `resolver` is
@@ -5512,28 +4930,6 @@
   }
 
   /**
-   * Creates a function that is restricted to invoking `func` once. Repeat calls
-   * to the function return the value of the first invocation. The `func` is
-   * invoked with the `this` binding and arguments of the created function.
-   *
-   * @static
-   * @memberOf _
-   * @since 0.1.0
-   * @category Function
-   * @param {Function} func The function to restrict.
-   * @returns {Function} Returns the new restricted function.
-   * @example
-   *
-   * var initialize = _.once(createApplication);
-   * initialize();
-   * initialize();
-   * // => `createApplication` is invoked once
-   */
-  function once(func) {
-    return before(2, func);
-  }
-
-  /**
    * Creates a function that invokes `func` with `partials` prepended to the
    * arguments it receives. This method is like `_.bind` except it does **not**
    * alter the `this` binding.
@@ -5570,68 +4966,6 @@
     var holders = replaceHolders(partials, getHolder(partial));
     return createWrap(func, PARTIAL_FLAG, undefined, partials, holders);
   });
-
-  /**
-   * Creates a throttled function that only invokes `func` at most once per
-   * every `wait` milliseconds. The throttled function comes with a `cancel`
-   * method to cancel delayed `func` invocations and a `flush` method to
-   * immediately invoke them. Provide `options` to indicate whether `func`
-   * should be invoked on the leading and/or trailing edge of the `wait`
-   * timeout. The `func` is invoked with the last arguments provided to the
-   * throttled function. Subsequent calls to the throttled function return the
-   * result of the last `func` invocation.
-   *
-   * **Note:** If `leading` and `trailing` options are `true`, `func` is
-   * invoked on the trailing edge of the timeout only if the throttled function
-   * is invoked more than once during the `wait` timeout.
-   *
-   * If `wait` is `0` and `leading` is `false`, `func` invocation is deferred
-   * until to the next tick, similar to `setTimeout` with a timeout of `0`.
-   *
-   * See [David Corbacho's article](https://css-tricks.com/debouncing-throttling-explained-examples/)
-   * for details over the differences between `_.throttle` and `_.debounce`.
-   *
-   * @static
-   * @memberOf _
-   * @since 0.1.0
-   * @category Function
-   * @param {Function} func The function to throttle.
-   * @param {number} [wait=0] The number of milliseconds to throttle invocations to.
-   * @param {Object} [options={}] The options object.
-   * @param {boolean} [options.leading=true]
-   *  Specify invoking on the leading edge of the timeout.
-   * @param {boolean} [options.trailing=true]
-   *  Specify invoking on the trailing edge of the timeout.
-   * @returns {Function} Returns the new throttled function.
-   * @example
-   *
-   * // Avoid excessively updating the position while scrolling.
-   * jQuery(window).on('scroll', _.throttle(updatePosition, 100));
-   *
-   * // Invoke `renewToken` when the click event is fired, but not more than once every 5 minutes.
-   * var throttled = _.throttle(renewToken, 300000, { 'trailing': false });
-   * jQuery(element).on('click', throttled);
-   *
-   * // Cancel the trailing throttled invocation.
-   * jQuery(window).on('popstate', throttled.cancel);
-   */
-  function throttle(func, wait, options) {
-    var leading = true,
-        trailing = true;
-
-    if (typeof func != 'function') {
-      throw new TypeError(FUNC_ERROR_TEXT);
-    }
-    if (isObject(options)) {
-      leading = 'leading' in options ? !!options.leading : leading;
-      trailing = 'trailing' in options ? !!options.trailing : trailing;
-    }
-    return debounce(func, wait, {
-      'leading': leading,
-      'maxWait': wait,
-      'trailing': trailing
-    });
-  }
 
   /*------------------------------------------------------------------------*/
 
@@ -6392,65 +5726,6 @@
   });
 
   /**
-   * This method is like `_.assignIn` except that it accepts `customizer`
-   * which is invoked to produce the assigned values. If `customizer` returns
-   * `undefined`, assignment is handled by the method instead. The `customizer`
-   * is invoked with five arguments: (objValue, srcValue, key, object, source).
-   *
-   * **Note:** This method mutates `object`.
-   *
-   * @static
-   * @memberOf _
-   * @since 4.0.0
-   * @alias extendWith
-   * @category Object
-   * @param {Object} object The destination object.
-   * @param {...Object} sources The source objects.
-   * @param {Function} [customizer] The function to customize assigned values.
-   * @returns {Object} Returns `object`.
-   * @see _.assignWith
-   * @example
-   *
-   * function customizer(objValue, srcValue) {
-   *   return _.isUndefined(objValue) ? srcValue : objValue;
-   * }
-   *
-   * var defaults = _.partialRight(_.assignInWith, customizer);
-   *
-   * defaults({ 'a': 1 }, { 'b': 2 }, { 'a': 3 });
-   * // => { 'a': 1, 'b': 2 }
-   */
-  var assignInWith = createAssigner(function(object, source, srcIndex, customizer) {
-    copyObject(source, keysIn(source), object, customizer);
-  });
-
-  /**
-   * Assigns own and inherited enumerable string keyed properties of source
-   * objects to the destination object for all destination properties that
-   * resolve to `undefined`. Source objects are applied from left to right.
-   * Once a property is set, additional values of the same property are ignored.
-   *
-   * **Note:** This method mutates `object`.
-   *
-   * @static
-   * @since 0.1.0
-   * @memberOf _
-   * @category Object
-   * @param {Object} object The destination object.
-   * @param {...Object} [sources] The source objects.
-   * @returns {Object} Returns `object`.
-   * @see _.defaultsDeep
-   * @example
-   *
-   * _.defaults({ 'a': 1 }, { 'b': 2 }, { 'a': 3 });
-   * // => { 'a': 1, 'b': 2 }
-   */
-  var defaults = baseRest(function(args) {
-    args.push(undefined, assignInDefaults);
-    return apply(assignInWith, undefined, args);
-  });
-
-  /**
    * Gets the value at `path` of `object`. If the resolved value is
    * `undefined`, the `defaultValue` is returned in its place.
    *
@@ -6478,37 +5753,6 @@
   function get(object, path, defaultValue) {
     var result = object == null ? undefined : baseGet(object, path);
     return result === undefined ? defaultValue : result;
-  }
-
-  /**
-   * Checks if `path` is a direct property of `object`.
-   *
-   * @static
-   * @since 0.1.0
-   * @memberOf _
-   * @category Object
-   * @param {Object} object The object to query.
-   * @param {Array|string} path The path to check.
-   * @returns {boolean} Returns `true` if `path` exists, else `false`.
-   * @example
-   *
-   * var object = { 'a': { 'b': 2 } };
-   * var other = _.create({ 'a': _.create({ 'b': 2 }) });
-   *
-   * _.has(object, 'a');
-   * // => true
-   *
-   * _.has(object, 'a.b');
-   * // => true
-   *
-   * _.has(object, ['a', 'b']);
-   * // => true
-   *
-   * _.has(other, 'a');
-   * // => false
-   */
-  function has(object, path) {
-    return object != null && hasPath(object, path, baseHas);
   }
 
   /**
@@ -6540,26 +5784,6 @@
   function hasIn(object, path) {
     return object != null && hasPath(object, path, baseHasIn);
   }
-
-  /**
-   * Invokes the method at `path` of `object`.
-   *
-   * @static
-   * @memberOf _
-   * @since 4.0.0
-   * @category Object
-   * @param {Object} object The object to query.
-   * @param {Array|string} path The path of the method to invoke.
-   * @param {...*} [args] The arguments to invoke the method with.
-   * @returns {*} Returns the result of the invoked method.
-   * @example
-   *
-   * var object = { 'a': [{ 'b': { 'c': [1, 2, 3, 4] } }] };
-   *
-   * _.invoke(object, 'a[0].b.c.slice', 1, 3);
-   * // => [2, 3]
-   */
-  var invoke = baseRest(baseInvoke);
 
   /**
    * Creates an array of the own enumerable property names of `object`.
@@ -6806,58 +6030,6 @@
   /*------------------------------------------------------------------------*/
 
   /**
-   * Checks if `n` is between `start` and up to, but not including, `end`. If
-   * `end` is not specified, it's set to `start` with `start` then set to `0`.
-   * If `start` is greater than `end` the params are swapped to support
-   * negative ranges.
-   *
-   * @static
-   * @memberOf _
-   * @since 3.3.0
-   * @category Number
-   * @param {number} number The number to check.
-   * @param {number} [start=0] The start of the range.
-   * @param {number} end The end of the range.
-   * @returns {boolean} Returns `true` if `number` is in the range, else `false`.
-   * @see _.range, _.rangeRight
-   * @example
-   *
-   * _.inRange(3, 2, 4);
-   * // => true
-   *
-   * _.inRange(4, 8);
-   * // => true
-   *
-   * _.inRange(4, 2);
-   * // => false
-   *
-   * _.inRange(2, 2);
-   * // => false
-   *
-   * _.inRange(1.2, 2);
-   * // => true
-   *
-   * _.inRange(5.2, 4);
-   * // => false
-   *
-   * _.inRange(-3, -2, -6);
-   * // => true
-   */
-  function inRange(number, start, end) {
-    start = toFinite(start);
-    if (end === undefined) {
-      end = start;
-      start = 0;
-    } else {
-      end = toFinite(end);
-    }
-    number = toNumber(number);
-    return baseInRange(number, start, end);
-  }
-
-  /*------------------------------------------------------------------------*/
-
-  /**
    * Creates a function that returns `value`.
    *
    * @static
@@ -7074,14 +6246,8 @@
   /*------------------------------------------------------------------------*/
 
   // Add methods that return wrapped values in chain sequences.
-  lodash.after = after;
   lodash.assignIn = assignIn;
-  lodash.assignInWith = assignInWith;
-  lodash.before = before;
-  lodash.bind = bind;
   lodash.constant = constant;
-  lodash.debounce = debounce;
-  lodash.defaults = defaults;
   lodash.filter = filter;
   lodash.flatten = flatten;
   lodash.intersection = intersection;
@@ -7094,21 +6260,16 @@
   lodash.merge = merge;
   lodash.negate = negate;
   lodash.omitBy = omitBy;
-  lodash.once = once;
   lodash.partial = partial;
   lodash.pick = pick;
   lodash.pickBy = pickBy;
   lodash.property = property;
-  lodash.reject = reject;
   lodash.remove = remove;
-  lodash.sortBy = sortBy;
-  lodash.throttle = throttle;
   lodash.toPlainObject = toPlainObject;
   lodash.values = values;
 
   // Add aliases.
   lodash.extend = assignIn;
-  lodash.extendWith = assignInWith;
 
   /*------------------------------------------------------------------------*/
 
@@ -7120,14 +6281,10 @@
   lodash.findIndex = findIndex;
   lodash.forEach = forEach;
   lodash.get = get;
-  lodash.has = has;
   lodash.hasIn = hasIn;
-  lodash.head = head;
   lodash.identity = identity;
   lodash.includes = includes;
   lodash.indexOf = indexOf;
-  lodash.inRange = inRange;
-  lodash.invoke = invoke;
   lodash.isArguments = isArguments;
   lodash.isArray = isArray;
   lodash.isArrayLike = isArrayLike;
@@ -7152,7 +6309,6 @@
   lodash.stubFalse = stubFalse;
   lodash.noConflict = noConflict;
   lodash.noop = noop;
-  lodash.now = now;
   lodash.reduce = reduce;
   lodash.result = result;
   lodash.toFinite = toFinite;
@@ -7163,7 +6319,6 @@
 
   // Add aliases.
   lodash.each = forEach;
-  lodash.first = head;
 
   /*------------------------------------------------------------------------*/
 
@@ -7177,9 +6332,7 @@
   lodash.VERSION = VERSION;
 
   // Assign default placeholders.
-  arrayEach(['bind', 'partial'], function(methodName) {
-    lodash[methodName].placeholder = lodash;
-  });
+  partial.placeholder = lodash;
 
   /*--------------------------------------------------------------------------*/
 
