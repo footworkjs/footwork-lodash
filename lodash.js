@@ -1,7 +1,7 @@
 /**
  * @license
  * lodash (Custom Build) <https://lodash.com/>
- * Build: `lodash -d -o lodash.js exports="node" include="isFunction,isObject,isString,isBoolean,isNumber,isUndefined,isArray,isNull,extend,pick,each,filter,invokeMap,clone,reduce,result,uniqueId,map,find,omitBy,indexOf,values,last,isEqual,noop,keys,merge,intersection,every,isRegExp,identity,includes,partial,noConflict,remove"`
+ * Build: `lodash -d -o lodash.js exports="node" include="isFunction,isObject,isString,isBoolean,isNumber,isUndefined,isArray,isNull,extend,pick,each,filter,invokeMap,clone,reduce,result,uniqueId,map,find,omitBy,indexOf,values,last,isEqual,noop,keys,merge,intersection,every,isRegExp,identity,includes,partial,noConflict,remove,bind"`
  * Copyright jQuery Foundation and other contributors <https://jquery.org/>
  * Released under MIT license <https://lodash.com/license>
  * Based on Underscore.js 1.8.3 <http://underscorejs.org/LICENSE>
@@ -4827,6 +4827,50 @@
   /*------------------------------------------------------------------------*/
 
   /**
+   * Creates a function that invokes `func` with the `this` binding of `thisArg`
+   * and `partials` prepended to the arguments it receives.
+   *
+   * The `_.bind.placeholder` value, which defaults to `_` in monolithic builds,
+   * may be used as a placeholder for partially applied arguments.
+   *
+   * **Note:** Unlike native `Function#bind`, this method doesn't set the "length"
+   * property of bound functions.
+   *
+   * @static
+   * @memberOf _
+   * @since 0.1.0
+   * @category Function
+   * @param {Function} func The function to bind.
+   * @param {*} thisArg The `this` binding of `func`.
+   * @param {...*} [partials] The arguments to be partially applied.
+   * @returns {Function} Returns the new bound function.
+   * @example
+   *
+   * function greet(greeting, punctuation) {
+   *   return greeting + ' ' + this.user + punctuation;
+   * }
+   *
+   * var object = { 'user': 'fred' };
+   *
+   * var bound = _.bind(greet, object, 'hi');
+   * bound('!');
+   * // => 'hi fred!'
+   *
+   * // Bound with placeholders.
+   * var bound = _.bind(greet, object, _, '!');
+   * bound('hi');
+   * // => 'hi fred!'
+   */
+  var bind = baseRest(function(func, thisArg, partials) {
+    var bitmask = BIND_FLAG;
+    if (partials.length) {
+      var holders = replaceHolders(partials, getHolder(bind));
+      bitmask |= PARTIAL_FLAG;
+    }
+    return createWrap(func, bitmask, thisArg, partials, holders);
+  });
+
+  /**
    * Creates a function that memoizes the result of `func`. If `resolver` is
    * provided, it determines the cache key for storing the result based on the
    * arguments provided to the memoized function. By default, the first argument
@@ -6247,6 +6291,7 @@
 
   // Add methods that return wrapped values in chain sequences.
   lodash.assignIn = assignIn;
+  lodash.bind = bind;
   lodash.constant = constant;
   lodash.filter = filter;
   lodash.flatten = flatten;
@@ -6332,7 +6377,9 @@
   lodash.VERSION = VERSION;
 
   // Assign default placeholders.
-  partial.placeholder = lodash;
+  arrayEach(['bind', 'partial'], function(methodName) {
+    lodash[methodName].placeholder = lodash;
+  });
 
   /*--------------------------------------------------------------------------*/
 
