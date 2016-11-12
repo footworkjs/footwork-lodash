@@ -2,12 +2,15 @@
   "name": "footwork-lodash",
   "description": "Custom lodash build utilized internally by FootworkJS",
   "author": "Jonathan Newman (http://staticty.pe)",
-  "version": "4.12.0",
+  "version": "2.0.0",
   "homepage": "http://footworkjs.com",
   "license": "MIT",
+  "main": "lodash.js",
   "repository": {
     "type": "git",
-    "url": "git://github.com/footworkjs/lodash.git"
+    "url": "https://github.com/footworkjs/footwork-lodash.git"
   },
-  "main": "lodash.js"
+  "bugs": {
+    "url": "https://github.com/footworkjs/footwork-lodash/issues"
+  }
 }
