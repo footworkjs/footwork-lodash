@@ -2,7 +2,7 @@
   "name": "footwork-lodash",
   "description": "Custom lodash build utilized internally by FootworkJS",
   "author": "Jonathan Newman (http://staticty.pe)",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "homepage": "http://footworkjs.com",
   "license": "MIT",
   "main": "lodash.js",
