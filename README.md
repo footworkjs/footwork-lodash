@@ -13,7 +13,7 @@ This repository contains the custom lodash build utilized internally by [Footwor
 
 1. Then generate the build from the command line with this command
 
-        lodash -d -o lodash.js exports="node" include="isFunction,isObject,isString,isBoolean,isNumber,isUndefined,isArray,isNull,extend,pick,each,filter,invokeMap,clone,reduce,result,map,find,omitBy,indexOf,values,last,isEqual,noop,keys,merge,intersection,every,isRegExp,identity,includes,partial,noConflict,remove,bind,once"
+        lodash -d -o lodash.js exports="node" include="isFunction,isObject,isString,isBoolean,isNumber,isUndefined,isArray,isNull,extend,pick,each,filter,invokeMap,clone,reduce,result,map,find,omitBy,indexOf,values,last,isEqual,noop,keys,merge,intersection,every,isRegExp,identity,includes,partial,noConflict,remove,bind"
 
 ### License
 
